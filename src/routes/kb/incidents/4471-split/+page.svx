@@ -1,0 +1,48 @@
+---
+layout: runbook
+title: '#4471 · two problems, not one'
+owner: arkdru23
+status: open
+reviewed: 2026-10-28
+signature: 'v1.eyJzdG9yeSI6Im9mZiIsInN1YiI6IjM1NSIsImF1ZCI6ImNoYWxsZW5nZTp3aGF0LWl0LXNob3dzIiwiaWF0IjoxNzkzMTc5NTIwLCJleHAiOjE3OTMyNjU5MjB9.Jgp7NR1eSeQ6xdKU2jRuNoX6Af1dhaw38vIcmPgzo38'
+---
+
+<script>
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+[#4471](/kb/incidents/4471) was merged as one issue because the subject lines matched
+([decision 0001](/kb/decisions/0001-dedupe-by-subject)). The reports hold two problems with two
+different fixes. Both flip a date's month and day for tenants that write the day first.
+
+<Callout>
+Not one issue. The parser fix queued for #4471 does not reach the second problem.
+</Callout>
+
+## What was merged
+
+<CauseTable ticket={4471} />
+
+Each report is placed by its tenant's locale and booking form (`causes.ts`), not by the tag intake
+guessed from the reporter's browser. The two disagree on some reports, so a count by intake tag is
+wrong. The export repeats some reports; the table counts each id once.
+
+## The two problems
+
+1. **`parser`: dates are read month first.** The shared parser reads every date month first.
+   Ticket: [issue 1](https://github.com/arkdru23/what-it-shows/issues/1). Fix: read dates by the
+   tenant's locale.
+2. **`hint`: the booking-v3 form hint is month first.** The form prints a month-first hint under
+   its date field. People at day-first tenants type what the hint says, and the form reads it
+   day first. Ticket: [issue 2](https://github.com/arkdru23/what-it-shows/issues/2). Fix: change
+   the hint the form prints. A parser fix does not touch it.
+
+## Lessons
+
+- Merging on the subject line joined reports whose causes differ. Count the cause, not the subject.
+- A tag guessed at intake is a guess. The tenant says which cause a report has.
+- A number that can be computed is computed: the table above is built from the data.
+
+<RenderStamp {signature} />
